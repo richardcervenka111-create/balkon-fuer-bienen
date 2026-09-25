@@ -1,6 +1,6 @@
 # Balkon für Bienen
 
-20 Pflanzen, die auf einem Berner Balkon Wildbienen, Hummeln und Schmetterlinge ernähren: Monat wählen, sehen, was jetzt blüht und was jetzt gesät oder gepflanzt wird. Sieben Regeln, die mehr bringen als jedes Insektenhotel aus dem Baumarkt. DE/EN/SK, kein Tracking.
+20 Pflanzen, die auf einem Berner Balkon Wildbienen, Hummeln und Schmetterlinge ernähren: Monat wählen, sehen, was jetzt blüht und was jetzt gesät oder gepflanzt wird. Sieben Regeln, die mehr bringen als jedes Insektenhotel aus dem Baumarkt. DE/EN, kein Tracking.
 
 Live: **https://richardcervenka111-create.github.io/balkon-fuer-bienen/**
 
