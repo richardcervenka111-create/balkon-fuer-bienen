@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balkon für Bienen</title>
+<meta name="description" content="Welche Pflanzen auf dem Berner Balkon wann für Wildbienen und Schmetterlinge blühen, und wann man sie setzt. Monat wählen, Liste drucken. Kein Tracking.">
+<style>
+:root{--bg:#1f2a12;--card:#2a3719;--line:#3f5226;--txt:#f4f7ea;--mut:#bfcaa3;--acc:#f5d547;--now:#ffb347}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:17px/1.5 -apple-system,system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:24px;margin:8px 0 2px}.sub{color:var(--mut);font-size:14px;margin-bottom:12px}
+.lang{float:right}.lang button{background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:4px 8px;font-size:13px;cursor:pointer}.lang button[aria-pressed="true"]{background:var(--acc);color:#231;border-color:var(--acc)}
+.months{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0 16px}
+.months button{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 4px;font-size:14px;cursor:pointer;min-height:44px}
+.months button[aria-pressed="true"]{background:var(--acc);color:#231;border-color:var(--acc);font-weight:700}.months button.now{outline:2px solid var(--now)}
+h2{font-size:17px;margin:18px 0 8px;color:var(--acc)}
+.p{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0}
+.p b{font-size:16px}.p .l{font-style:italic;color:var(--mut);font-size:13px}.p .d{font-size:14px;margin-top:4px}
+.p .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--line);margin:4px 4px 0 0}
+.p .tag.sun{background:#5a4a12}.p .tag.shade{background:#2b3f5a}.p .tag.ess{background:#4b2d5a}
+.rules{background:var(--card);border-left:3px solid var(--acc);border-radius:8px;padding:12px;margin-top:16px;font-size:15px}.rules li{margin:4px 0}
+.foot{color:var(--mut);font-size:13px;margin-top:26px;border-top:1px solid var(--line);padding-top:10px}.foot a{color:var(--acc)}
+</style>
+</head>
+<body>
+<main>
+<div class="lang" role="group"><button data-l="de" aria-pressed="true">DE</button><button data-l="en" aria-pressed="false">EN</button><button data-l="sk" aria-pressed="false">SK</button></div>
+<h1 id="h"></h1><div class="sub" id="s"></div>
+<div class="months" id="months"></div>
+<h2 id="hb"></h2><div id="bloom"></div>
+<h2 id="hp"></h2><div id="plant"></div>
+<div class="rules" id="rules"></div>
+<div class="foot" id="foot"></div>
+</main>
+<script>
+(function(){
+// bloom = Blühmonate auf dem Balkon im Mittelland (Bern, ca. 550 m), sow = Aussaat/Pflanzung, sun: 1 = volle Sonne, 0 = Halbschatten ok, ess = essbar
+const P=[
+ ["Krokus","Crocus","Krokus","Crocus vernus / tommasinianus",[2,3],[9,10,11],1,0,"Erste Nahrung nach dem Winter für Königinnen der Hummeln. Im Herbst 5 cm tief in den Kasten, Wildformen sind besser als gefüllte Sorten."],
+ ["Traubenhyazinthe","Grape hyacinth","Modrica","Muscari armeniacum",[3,4],[9,10],1,0,"Robust, kommt jedes Jahr wieder. Blau lockt Wildbienen, die Blüte hat offenen Nektar."],
+ ["Schnittlauch","Chives","Pažítka","Allium schoenoprasum",[5,6],[3,4,9],0,1,"Blühen lassen statt nur schneiden: die lila Kugeln sind Bienenmagnete. Halb ernten, halb blühen lassen."],
+ ["Thymian","Thyme","Tymián","Thymus vulgaris",[5,6,7],[4,5],1,1,"Auf dem Südbalkon in magerer Erde. Blüht wochenlang, Wild- und Honigbienen, und in der Küche das ganze Jahr."],
+ ["Salbei","Sage","Šalvia","Salvia officinalis",[5,6,7],[4,5],1,1,"Hummeln lieben die Lippenblüten. Nach der Blüte ein Drittel zurückschneiden, dann bleibt er kompakt."],
+ ["Borretsch","Borage","Borák","Borago officinalis",[6,7,8,9],[4,5,6],1,1,"Produziert Nektar alle zwei Stunden nach. Sät sich selbst aus. Blüten in den Salat, Blätter in Gurkenwasser."],
+ ["Kornblume","Cornflower","Nevädza","Centaurea cyanus",[6,7,8],[3,4,9,10],1,0,"Einjährig, direkt in den Kasten säen, mager halten. Herbstaussaat blüht früher und kräftiger."],
+ ["Ringelblume","Pot marigold","Nechtík","Calendula officinalis",[6,7,8,9,10],[3,4,5],1,1,"Anspruchslos, blüht bis zum Frost, wenn man Verblühtes abschneidet. Blütenblätter essbar."],
+ ["Phacelia","Lacy phacelia","Facélia","Phacelia tanacetifolia",[6,7,8],[4,5,6],1,0,"Die Bienenweide schlechthin: pro Fläche mehr Nektar als fast alles andere. Einjährig, nachsäen alle 4 Wochen für Dauerblüte."],
+ ["Lavendel","Lavender","Levanduľa","Lavandula angustifolia",[6,7,8],[4,5,9],1,0,"Nur echter Lavendel (angustifolia) ist winterhart in Bern. Topf mit Drainage, nie nasse Füsse. Nach der Blüte um ein Drittel schneiden."],
+ ["Oregano / Dost","Oregano","Oregano","Origanum vulgare",[7,8,9],[4,5],1,1,"Schmetterlingspflanze Nummer eins, dazu Wildbienen. Im Winter draussen lassen, treibt im April wieder."],
+ ["Wilde Möhre","Wild carrot","Mrkva obyčajná","Daucus carota",[6,7,8],[4,5,9],1,0,"Zweijährig: im ersten Jahr Rosette, im zweiten die Dolde. Futterpflanze für den Schwalbenschwanz. Tiefer Topf."],
+ ["Kapuzinerkresse","Nasturtium","Kapucínka","Tropaeolum majus",[7,8,9,10],[5],0,1,"Hängt aus dem Kasten, Hummeln kriechen in die Sporne. Blüten und Blätter pfeffrig in den Salat. Frostempfindlich, erst nach den Eisheiligen."],
+ ["Fetthenne","Stonecrop","Rozchodník","Sedum telephium / spectabile",[8,9,10],[4,5,9],1,0,"Der Herbst-Tisch für Bienen und Schmetterlinge, wenn sonst wenig blüht. Übersteht Trockenheit und Ferien ohne Giessen."],
+ ["Efeu","Ivy","Brečtan","Hedera helix",[9,10,11],[4,5,9,10],0,0,"Blüht erst als alte Pflanze, dann im Oktober der letzte grosse Nektar des Jahres. Für die Efeu-Seidenbiene die einzige Nahrung. Am Geländer hochlassen."],
+ ["Schneeheide","Winter heath","Vresovec","Erica carnea",[1,2,3],[9,10],0,0,"Blüht mitten im Winter an sonnigen Tagen, wenn die ersten Hummeln fliegen. Saurer Boden, Regenwasser."],
+ ["Glockenblume","Bellflower","Zvonček","Campanula rotundifolia / poscharskyana",[6,7,8],[4,5,9],0,0,"Für Halbschatten. Mehrere Wildbienenarten sammeln nur an Glockenblumen. Mehrjährig, pflegeleicht."],
+ ["Natternkopf","Viper's bugloss","Hadinec","Echium vulgare",[6,7,8],[4,5,9],1,0,"Zweijährig, blau, extrem nektarreich. Tiefer Topf, magere Erde. Mauerbienen und Hummeln."],
+ ["Sonnenblume","Sunflower","Slnečnica","Helianthus annuus",[7,8,9],[4,5],1,1,"Nur ungefüllte Sorten (gefüllte haben keinen Pollen). Kerne im Herbst für Vögel dranlassen."],
+ ["Minze","Mint","Mäta","Mentha spec.",[7,8],[4,5],0,1,"Blühen lassen: Schwebfliegen und Bienen. Immer eigener Topf, sie überwuchert alles. Halbschatten reicht."],
+];
+const L={
+ de:{h:"Balkon für Bienen",s:"20 Pflanzen, die in Bern auf dem Balkon Wildbienen, Hummeln und Schmetterlinge ernähren. Monat wählen: was jetzt blüht, was jetzt gesetzt wird.",hb:"Blüht jetzt",hp:"Jetzt säen oder pflanzen",sun:"volle Sonne",shade:"Halbschatten ok",ess:"essbar",none:"In diesem Monat nichts. Winterruhe: Töpfe nicht abräumen, in hohlen Stängeln überwintern Wildbienen.",
+   rules:["<b>Ungefüllte Blüten.</b> Gefüllte Zuchtformen haben keinen Pollen und keinen Nektar, sehen für Bienen aus wie eine geschlossene Tür.","<b>Kein Pestizid, auch kein „Bio“-Spray.</b> Blattläuse fressen Marienkäfer und Schwebfliegenlarven, wenn man sie lässt.","<b>Nicht alles gleichzeitig.</b> Ziel: von Februar (Krokus) bis Oktober (Efeu, Fetthenne) immer etwas offen.","<b>Erde mager, nicht gedüngt.</b> Wildpflanzen blühen hungrig besser.","<b>Wasserschale mit Steinen.</b> Bienen ertrinken in glatten Schalen, sie brauchen Landeplätze.","<b>Im Herbst stehen lassen.</b> Abgestorbene Stängel sind Winterquartier. Erst im April schneiden.","<b>Ein Nisthilfe-Block</b> mit 3–8 mm Bohrungen in Hartholz, Südseite, unter dem Dach: Mauerbienen ziehen im März ein."],
+   foot:'Auswahl nach Bioterra, Pro Natura und Praxis auf dem Berner Balkon (Mittelland, ca. 550 m). Blühmonate sind Richtwerte, ein warmer Frühling verschiebt sie. Keine Garantie für den einzelnen Balkon. Kein Tracking. <a href="https://github.com/richardcervenka111-create/balkon-fuer-bienen">GitHub</a> · MIT',months:["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"]},
+ en:{h:"Balcony for bees",s:"20 plants that feed wild bees, bumblebees and butterflies on a Bern balcony. Pick a month: what blooms now, what to sow or plant now.",hb:"Blooming now",hp:"Sow or plant now",sun:"full sun",shade:"part shade ok",ess:"edible",none:"Nothing this month. Winter rest: do not clear the pots, wild bees overwinter in hollow stems.",
+   rules:["<b>Single flowers.</b> Double-flowered cultivars have no pollen and no nectar; to a bee they look like a closed door.","<b>No pesticide, not even “organic” spray.</b> Ladybirds and hoverfly larvae eat the aphids if you let them.","<b>Not everything at once.</b> Aim for something open from February (crocus) to October (ivy, stonecrop).","<b>Lean soil, no fertiliser.</b> Wild plants flower better when hungry.","<b>A water dish with stones.</b> Bees drown in smooth dishes; they need landing spots.","<b>Leave it standing in autumn.</b> Dead stems are winter quarters. Cut in April.","<b>A nesting block</b> with 3–8 mm holes in hardwood, south side, under the roof: mason bees move in in March."],
+   foot:'Selection after Bioterra, Pro Natura and practice on a Bern balcony (Swiss plateau, about 550 m). Bloom months are guide values; a warm spring shifts them. No guarantee for your particular balcony. No tracking. <a href="https://github.com/richardcervenka111-create/balkon-fuer-bienen">GitHub</a> · MIT',months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]},
+ sk:{h:"Balkón pre včely",s:"20 rastlín, ktoré na bernskom balkóne živia divé včely, čmeliaky a motýle. Vyber mesiac: čo teraz kvitne, čo sa teraz seje alebo sadí.",hb:"Kvitne teraz",hp:"Teraz siať alebo sadiť",sun:"plné slnko",shade:"polotieň stačí",ess:"jedlé",none:"V tomto mesiaci nič. Zimný pokoj: kvetináče nevypratávaj, v dutých stonkách zimujú divé včely.",
+   rules:["<b>Jednoduché kvety.</b> Plnokveté odrody nemajú peľ ani nektár; pre včelu sú ako zavreté dvere.","<b>Žiadny pesticíd, ani „bio“ sprej.</b> Vošky zjedia lienky a larvy pestríc, keď ich necháš.","<b>Nie všetko naraz.</b> Cieľ: od februára (krokus) do októbra (brečtan, rozchodník) stále niečo otvorené.","<b>Chudobná pôda, bez hnojenia.</b> Divé rastliny kvitnú hladné lepšie.","<b>Miska s vodou a kameňmi.</b> Včely sa v hladkých miskách topia, potrebujú pristávacie plochy.","<b>Na jeseň nechať stáť.</b> Suché stonky sú zimný úkryt. Strihať až v apríli.","<b>Hniezdny blok</b> s otvormi 3–8 mm v tvrdom dreve, južná strana, pod strechou: murárky sa nasťahujú v marci."],
+   foot:'Výber podľa Bioterra, Pro Natura a praxe na bernskom balkóne (Mittelland, asi 550 m). Mesiace kvitnutia sú orientačné; teplá jar ich posunie. Bez záruky pre konkrétny balkón. Žiadne sledovanie. <a href="https://github.com/richardcervenka111-create/balkon-fuer-bienen">GitHub</a> · MIT',months:["Jan","Feb","Mar","Apr","Máj","Jún","Júl","Aug","Sep","Okt","Nov","Dec"]}};
+let lang="de", m=new Date().getMonth()+1; const now=m;
+const $=id=>document.getElementById(id); const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const name=x=>x[lang==="de"?0:lang==="en"?1:2];
+function card(x){ const T=L[lang]; return `<div class="p"><b>${esc(name(x))}</b> <span class="l">${esc(x[3])}</span><div class="d">${esc(x[8])}</div><span class="tag ${x[6]?"sun":"shade"}">${x[6]?T.sun:T.shade}</span>${x[7]?`<span class="tag ess">${T.ess}</span>`:""}<span class="tag">${T.months.filter((_,i)=>x[4].includes(i+1)).join(" ")}</span></div>`; }
+function render(){ const T=L[lang]; document.documentElement.lang=lang; document.title=T.h; $("h").textContent=T.h; $("s").textContent=T.s; $("hb").textContent=T.hb; $("hp").textContent=T.hp; $("foot").innerHTML=T.foot;
+  const mo=$("months"); mo.innerHTML=""; T.months.forEach((n,i)=>{ const b=document.createElement("button"); b.textContent=n; b.setAttribute("aria-pressed",i+1===m?"true":"false"); if(i+1===now) b.classList.add("now"); b.onclick=()=>{m=i+1; render();}; mo.appendChild(b); });
+  const bl=P.filter(x=>x[4].includes(m)), pl=P.filter(x=>x[5].includes(m));
+  $("bloom").innerHTML=bl.length?bl.map(card).join(""):`<p style="color:var(--mut)">${esc(T.none)}</p>`;
+  $("plant").innerHTML=pl.length?pl.map(card).join(""):`<p style="color:var(--mut)">–</p>`;
+  $("rules").innerHTML="<ul>"+T.rules.map(r=>"<li>"+r+"</li>").join("")+"</ul>";
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===lang?"true":"false")); }
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.l; render();}));
+render();
+})();
+</script>
+</body>
+</html>
